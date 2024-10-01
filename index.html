@@ -34,7 +34,7 @@
             <button type="button" id="deleteAll" class="btn btn-danger w-100 mt-2">Delete All</button>
             <button type="button" id="importExcel" class="btn btn-success w-100 mt-2">Import Excel</button>
             <br><br>
-            <input type="text" id="searchName" class="form-control w-100 mt-2" placeholder="Search by Name">
+            <input type="text" id="searchName" class="form-control w-100 mt-2" placeholder="Search by Name or Status">
         </form>
         <table id="profitTable" class="table table-striped">
             <thead>
@@ -49,10 +49,48 @@
             <tbody></tbody>
         </table>
         <div id="pagination" class="d-flex justify-content-center mt-3"></div>
+        <br>
         <div id="summaryCard" class="card mt-3">
             <div class="card-body">
                 <h5 class="card-title">Summary</h5>
                 <div id="summary"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Update Profit Modal -->
+    <div class="modal fade" id="updateProfitModal" tabindex="-1" aria-labelledby="updateProfitModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateProfitModalLabel">Update Profit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateProfitForm">
+                        <div class="mb-3">
+                            <input type="text" id="updateName" class="form-control" placeholder="Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" id="updateTransfer" class="form-control" placeholder="Transfer" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" id="updateProfit" class="form-control" placeholder="Profit" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <select id="updateStatus" class="form-control" required>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <input type="date" id="updateDate" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="saveUpdate" class="btn btn-primary">Update</button>
+                </div>
             </div>
         </div>
     </div>

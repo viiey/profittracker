@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderTable = (searchTerm = '') => {
         profitTableBody.innerHTML = '';
-        const filteredProfits = profits.filter(profit => profit.name.toLowerCase().includes(searchTerm));
+        const filteredProfits = profits.filter(profit =>
+            profit.name.toLowerCase().includes(searchTerm) ||
+            profit.status.toLowerCase().includes(searchTerm)
+        );
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const paginatedProfits = filteredProfits.slice(start, end);
@@ -37,8 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const actionRow = document.createElement('tr');
             actionRow.innerHTML = `
                 <td colspan="6" class="text-center">
-                    <button class="btn btn-outline-primary btn-sm update" onclick="editProfit(${start + index})">Update</button>
-                    <button class="btn btn-outline-primary btn-sm delete" onclick="deleteProfit(${start + index})">Delete</button>
+                    <button class="btn btn-outline-primary btn-sm update" onclick="editProfit(${profits.indexOf(profit)})">Update</button>
+                    <button class="btn btn-outline-primary btn-sm delete" onclick="deleteProfit(${profits.indexOf(profit)})">Delete</button>
                 </td>
             `;
             profitTableBody.appendChild(row);
@@ -67,26 +70,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderSummary = (filteredProfits = profits) => {
-        const totalTransfer = filteredProfits.reduce((sum, profit) => sum + parseFloat(profit.transfer), 0).toFixed(2);
-        const totalProfit = filteredProfits.reduce((sum, profit) => sum + parseFloat(profit.profit), 0).toFixed(2);
-        const statusCounts = filteredProfits.reduce((counts, profit) => {
+    const renderSummary = () => {
+        const totalTransfer = profits.reduce((sum, profit) => sum + parseFloat(profit.transfer), 0).toFixed(2);
+        const totalProfit = profits.reduce((sum, profit) => sum + parseFloat(profit.profit), 0).toFixed(2);
+
+        const totalTransferPaid = profits
+            .filter(profit => profit.status === 'Paid')
+            .reduce((sum, profit) => sum + parseFloat(profit.transfer), 0)
+            .toFixed(2);
+
+        const totalTransferPending = profits
+            .filter(profit => profit.status === 'Pending')
+            .reduce((sum, profit) => sum + parseFloat(profit.transfer), 0)
+            .toFixed(2);
+
+        const totalProfitPaid = profits
+            .filter(profit => profit.status === 'Paid')
+            .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
+            .toFixed(2);
+
+        const totalProfitPending = profits
+            .filter(profit => profit.status === 'Pending')
+            .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
+            .toFixed(2);
+
+        const statusCounts = profits.reduce((counts, profit) => {
             counts[profit.status] = (counts[profit.status] || 0) + 1;
             return counts;
         }, {});
 
-        let statusCountsHtml = '';
-        for (const [status, count] of Object.entries(statusCounts)) {
-            statusCountsHtml += `<p>${status}: ${count}</p>`;
-        }
+        const statusCountsHtml = `
+            <div class="summary-item"><span class="summary-title">Paid:</span> <span>${statusCounts['Paid'] || 0}</span></div>
+            <div class="summary-item"><span class="summary-title">Pending:</span> <span>${statusCounts['Pending'] || 0}</span></div>
+        `;
 
         summaryDiv.innerHTML = `
-            <p>Total Transfer: ${totalTransfer}</p>
-            <p>Total Profit: ${totalProfit}</p>
+            <div class="summary-item"><span class="summary-title">Total Transfer:</span> <span>RM ${totalTransfer}</span></div>
+            <div class="summary-item"><span class="summary-title">Total Profit:</span> <span>RM ${totalProfit}</span></div>
+            <div class="summary-item"><span class="summary-title">Total Transfer (Paid):</span> <span>RM ${totalTransferPaid}</span></div>
+            <div class="summary-item"><span class="summary-title">Total Transfer (Pending):</span> <span>RM ${totalTransferPending}</span></div>
+            <div class="summary-item"><span class="summary-title">Total Profit (Paid):</span> <span>RM ${totalProfitPaid}</span></div>
+            <div class="summary-item"><span class="summary-title">Total Profit (Pending):</span> <span>RM ${totalProfitPending}</span></div>
             ${statusCountsHtml}
         `;
     };
-
 
     const saveProfits = () => {
         localStorage.setItem('profits', JSON.stringify(profits));
@@ -117,13 +144,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.editProfit = (index) => {
         const profit = profits[index];
-        document.getElementById('name').value = profit.name;
-        document.getElementById('transfer').value = parseFloat(profit.transfer).toFixed(2);
-        document.getElementById('profit').value = parseFloat(profit.profit).toFixed(2);
-        document.getElementById('status').value = profit.status;
-        document.getElementById('date').value = profit.date;
+        document.getElementById('updateName').value = profit.name;
+        document.getElementById('updateTransfer').value = parseFloat(profit.transfer).toFixed(2);
+        document.getElementById('updateProfit').value = parseFloat(profit.profit).toFixed(2);
+        document.getElementById('updateStatus').value = profit.status;
+        document.getElementById('updateDate').value = profit.date;
         editIndex = index;
+        const updateProfitModal = new bootstrap.Modal(document.getElementById('updateProfitModal'));
+        updateProfitModal.show();
     };
+
+    document.getElementById('saveUpdate').addEventListener('click', () => {
+        const name = document.getElementById('updateName').value;
+        const transfer = parseFloat(document.getElementById('updateTransfer').value).toFixed(2);
+        const profit = parseFloat(document.getElementById('updateProfit').value).toFixed(2);
+        const status = document.getElementById('updateStatus').value;
+        const date = document.getElementById('updateDate').value;
+
+        if (editIndex !== -1) {
+            profits[editIndex] = { name, transfer, profit, status, date };
+            saveProfits();
+            renderTable(document.getElementById('searchName').value.toLowerCase());
+            editIndex = -1;
+            const updateProfitModal = bootstrap.Modal.getInstance(document.getElementById('updateProfitModal'));
+            updateProfitModal.hide();
+        }
+    });
 
     window.deleteProfit = (index) => {
         profits.splice(index, 1);

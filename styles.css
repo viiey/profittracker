@@ -24,3 +24,26 @@ button.update, button.delete {
 #searchName::placeholder {
     text-align: center;
 }
+
+#summaryCard .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#summaryCard .summary-item {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+#summaryCard .summary-item:last-child {
+    border-bottom: none;
+}
+
+#summaryCard .summary-title {
+    font-weight: bold;
+    color: #007bff;
+}
