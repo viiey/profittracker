@@ -197,12 +197,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     renderTable();
-
-    // Pull-to-refresh implementation
-    PullToRefresh.init({
-        mainElement: 'body',
-        onRefresh() {
-            location.reload();
-        }
-    });
 });
