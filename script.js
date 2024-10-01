@@ -196,5 +196,12 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, filename);
     });
 
+    PullToRefresh.init({
+        mainElement: 'body', // Specify the main element
+        onRefresh: function() {
+            window.location.reload(); // Refresh the page
+        }
+    });
+
     renderTable();
 });
