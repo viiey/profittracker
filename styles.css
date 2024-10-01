@@ -20,3 +20,7 @@ button.update, button.delete {
     padding: 5px;
     margin: 2px;
 }
+
+#searchName::placeholder {
+    text-align: center;
+}

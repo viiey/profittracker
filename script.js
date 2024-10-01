@@ -13,16 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set default date to today
     document.getElementById('date').valueAsDate = new Date();
 
-    const renderTable = () => {
+    document.getElementById('searchName').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        renderTable(searchTerm);
+    });
+
+    const renderTable = (searchTerm = '') => {
         profitTableBody.innerHTML = '';
+        const filteredProfits = profits.filter(profit => profit.name.toLowerCase().includes(searchTerm));
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
-        const paginatedProfits = profits.slice(start, end);
+        const paginatedProfits = filteredProfits.slice(start, end);
 
         paginatedProfits.forEach((profit, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${profit.name}</td>
+                <td>${parseFloat(profit.transfer).toFixed(2)}</td>
                 <td>${parseFloat(profit.profit).toFixed(2)}</td>
                 <td>${profit.status}</td>
                 <td>${profit.date}</td>
@@ -34,20 +41,20 @@ document.addEventListener('DOMContentLoaded', () => {
             profitTableBody.appendChild(row);
         });
 
-        renderPagination();
-        renderSummary();
+        renderPagination(filteredProfits.length);
+        renderSummary(filteredProfits);
     };
 
-    const renderPagination = () => {
+    const renderPagination = (totalItems = profits.length) => {
         paginationDiv.innerHTML = '';
-        const pageCount = Math.ceil(profits.length / itemsPerPage);
+        const pageCount = Math.ceil(totalItems / itemsPerPage);
         for (let i = 1; i <= pageCount; i++) {
             const pageButton = document.createElement('button');
             pageButton.textContent = i;
             pageButton.className = 'btn btn-secondary btn-sm mx-1';
             pageButton.onclick = () => {
                 currentPage = i;
-                renderTable();
+                renderTable(document.getElementById('searchName').value.toLowerCase());
             };
             if (i === currentPage) {
                 pageButton.disabled = true;
@@ -56,9 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderSummary = () => {
-        const totalProfit = profits.reduce((sum, profit) => sum + parseFloat(profit.profit), 0).toFixed(2);
-        const statusCounts = profits.reduce((counts, profit) => {
+    const renderSummary = (filteredProfits = profits) => {
+        const totalTransfer = filteredProfits.reduce((sum, profit) => sum + parseFloat(profit.transfer), 0).toFixed(2);
+        const totalProfit = filteredProfits.reduce((sum, profit) => sum + parseFloat(profit.profit), 0).toFixed(2);
+        const statusCounts = filteredProfits.reduce((counts, profit) => {
             counts[profit.status] = (counts[profit.status] || 0) + 1;
             return counts;
         }, {});
@@ -69,10 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         summaryDiv.innerHTML = `
+            <p>Total Transfer: ${totalTransfer}</p>
             <p>Total Profit: ${totalProfit}</p>
             ${statusCountsHtml}
         `;
     };
+
 
     const saveProfits = () => {
         localStorage.setItem('profits', JSON.stringify(profits));
@@ -81,16 +91,17 @@ document.addEventListener('DOMContentLoaded', () => {
     profitForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = document.getElementById('name').value;
+        const transfer = parseFloat(document.getElementById('transfer').value).toFixed(2);
         const profit = parseFloat(document.getElementById('profit').value).toFixed(2);
         const status = document.getElementById('status').value;
         const date = document.getElementById('date').value;
 
-        console.log('Form Submitted:', { name, profit, status, date });
+        console.log('Form Submitted:', { name, transfer, profit, status, date });
 
         if (editIndex === -1) {
-            profits.push({ name, profit, status, date });
+            profits.push({ name, transfer, profit, status, date });
         } else {
-            profits[editIndex] = { name, profit, status, date };
+            profits[editIndex] = { name, transfer, profit, status, date };
             editIndex = -1;
         }
 
@@ -103,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.editProfit = (index) => {
         const profit = profits[index];
         document.getElementById('name').value = profit.name;
+        document.getElementById('transfer').value = parseFloat(profit.transfer).toFixed(2);
         document.getElementById('profit').value = parseFloat(profit.profit).toFixed(2);
         document.getElementById('status').value = profit.status;
         document.getElementById('date').value = profit.date;
@@ -119,6 +131,19 @@ document.addEventListener('DOMContentLoaded', () => {
         profits = [];
         saveProfits();
         renderTable();
+    });
+
+    document.getElementById('importExcel').addEventListener('click', () => {
+        const worksheet = XLSX.utils.json_to_sheet(profits);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Profits');
+
+        const now = new Date();
+        const formattedDate = now.toISOString().slice(0, 10); // YYYY-MM-DD
+        const formattedTime = now.toTimeString().slice(0, 8).replace(/:/g, '-'); // HH-MM-SS
+
+        const filename = `Profit Tracker ${formattedDate} ${formattedTime}.xlsx`;
+        XLSX.writeFile(workbook, filename);
     });
 
     renderTable();
