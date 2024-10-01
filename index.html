@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container mt-5 mb-5">
         <h1 class="text-center mb-4">Profit Tracker</h1>
         <form id="profitForm" class="mb-4">
             <div class="mb-3">
@@ -33,6 +33,7 @@
             <button type="submit" class="btn btn-primary w-100">Add Profit</button>
             <button type="button" id="deleteAll" class="btn btn-danger w-100 mt-2">Delete All</button>
             <button type="button" id="importExcel" class="btn btn-success w-100 mt-2">Import Excel</button>
+            <br><br>
             <input type="text" id="searchName" class="form-control w-100 mt-2" placeholder="Search by Name">
         </form>
         <table id="profitTable" class="table table-striped">
@@ -43,7 +44,6 @@
                     <th>Profit</th>
                     <th>Status</th>
                     <th>Date</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody></tbody>

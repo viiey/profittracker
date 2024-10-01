@@ -33,12 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${parseFloat(profit.profit).toFixed(2)}</td>
                 <td>${profit.status}</td>
                 <td>${profit.date}</td>
-                <td>
+            `;
+            const actionRow = document.createElement('tr');
+            actionRow.innerHTML = `
+                <td colspan="6" class="text-center">
                     <button class="btn btn-outline-primary btn-sm update" onclick="editProfit(${start + index})">Update</button>
                     <button class="btn btn-outline-primary btn-sm delete" onclick="deleteProfit(${start + index})">Delete</button>
                 </td>
             `;
             profitTableBody.appendChild(row);
+            profitTableBody.appendChild(actionRow);
         });
 
         renderPagination(filteredProfits.length);
