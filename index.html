@@ -31,29 +31,33 @@
             <div class="mb-3">
                 <input type="date" id="date" class="form-control" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Add Profit</button>
-            <button type="button" id="deleteAll" class="btn btn-danger w-100 mt-2">Delete All</button>
-            <button type="button" id="importExcel" class="btn btn-success w-100 mt-2">Import Excel</button>
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Add Profit</button>
             <br><br>
             <input type="text" id="searchName" class="form-control w-100 mt-2" placeholder="Search by Name or Status">
         </form>
-        <table id="profitTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Transfer</th>
-                    <th>Profit</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class=”table-responsive”>
+            <table id="profitTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Transfer</th>
+                        <th>Profit</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
         <div id="pagination" class="d-flex justify-content-center mt-3"></div>
+        <br>
+        <div class="d-flex justify-content-between mt-2">
+            <button type="button" id="deleteAll" class="btn btn-danger w-50 btn-lg">Delete All</button>
+            <button type="button" id="importExcel" class="btn btn-success w-50 btn-lg">Import Excel</button>
+        </div>
         <br>
         <div id="summaryCard" class="card mt-3">
             <div class="card-body">
-                <h5 class="card-title">Summary</h5>
                 <div id="summary"></div>
             </div>
         </div>
@@ -91,9 +95,28 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" id="saveUpdate" class="btn btn-primary">Update</button>
+                    <button type="button" id="deleteProfit" class="btn btn-danger">Delete</button>
                 </div>
             </div>
         </div>
+    </div>
+    <!-- Delete All Confirmation Modal -->
+    <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="deleteAllModalLabel">Confirm Delete</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            Are you sure you want to delete all records? This action cannot be undone.
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteAll">Delete All</button>
+        </div>
+        </div>
+    </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>

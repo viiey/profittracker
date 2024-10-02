@@ -34,16 +34,22 @@ button.update, button.delete {
 #summaryCard .summary-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     padding: 0.5rem 0;
     border-bottom: 1px solid #ddd;
 }
 
-#summaryCard .summary-item:last-child {
-    border-bottom: none;
-}
-
 #summaryCard .summary-title {
     font-weight: bold;
     color: #007bff;
+    flex-grow: 1; /* Allow the key to take up available space */
+    word-wrap: break-word; /* Allow the key to wrap onto multiple lines */
 }
+
+#summaryCard .summary-item span:last-child {
+    white-space: nowrap; /* Ensure the value stays on a single line */
+    text-align: right; /* Align the value to the right */
+    margin-left: 10px; /* Add a small margin for spacing */
+}
+

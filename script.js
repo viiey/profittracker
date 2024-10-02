@@ -15,19 +15,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('searchName').addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
+        currentPage = 1; // Reset to page 1 on search
         renderTable(searchTerm);
     });
 
     const renderTable = (searchTerm = '') => {
-        profitTableBody.innerHTML = '';
+        profitTableBody.innerHTML = '';  // Clear table before rendering
+
+        // Filter based on search term
         const filteredProfits = profits.filter(profit =>
             profit.name.toLowerCase().includes(searchTerm) ||
             profit.status.toLowerCase().includes(searchTerm)
         );
+
+        // Ensure pagination variables are correct
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
+
+        // Paginate the filtered profits
         const paginatedProfits = filteredProfits.slice(start, end);
 
+        // If no profits to display, show a message
+        if (paginatedProfits.length === 0 && currentPage > 1) {
+            currentPage = 1;  // Reset to page 1 if no data on the current page
+            renderTable(searchTerm);  // Re-render the table
+            return;
+        }
+
+        // Render each row and attach click events for modal
         paginatedProfits.forEach((profit, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -37,19 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${profit.status}</td>
                 <td>${profit.date}</td>
             `;
-            const actionRow = document.createElement('tr');
-            actionRow.innerHTML = `
-                <td colspan="6" class="text-center">
-                    <button class="btn btn-outline-primary btn-sm update" onclick="editProfit(${profits.indexOf(profit)})">Update</button>
-                    <button class="btn btn-outline-primary btn-sm delete" onclick="deleteProfit(${profits.indexOf(profit)})">Delete</button>
-                </td>
-            `;
+            // Add click event to the row
+            row.onclick = () => openModalForRow(start + index);  // Use start + index to ensure global index
             profitTableBody.appendChild(row);
-            profitTableBody.appendChild(actionRow);
         });
 
-        renderPagination(filteredProfits.length);
-        renderSummary(filteredProfits);
+        // Re-render pagination and summary
+        renderPagination(filteredProfits.length);  // Total items in the filtered list
+        renderSummary(filteredProfits);  // Only filtered profits for summary
     };
 
     const renderPagination = (totalItems = profits.length) => {
@@ -105,12 +115,30 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         summaryDiv.innerHTML = `
-            <div class="summary-item"><span class="summary-title">Total Transfer:</span> <span>RM ${totalTransfer}</span></div>
-            <div class="summary-item"><span class="summary-title">Total Profit:</span> <span>RM ${totalProfit}</span></div>
-            <div class="summary-item"><span class="summary-title">Total Transfer (Paid):</span> <span>RM ${totalTransferPaid}</span></div>
-            <div class="summary-item"><span class="summary-title">Total Transfer (Pending):</span> <span>RM ${totalTransferPending}</span></div>
-            <div class="summary-item"><span class="summary-title">Total Profit (Paid):</span> <span>RM ${totalProfitPaid}</span></div>
-            <div class="summary-item"><span class="summary-title">Total Profit (Pending):</span> <span>RM ${totalProfitPending}</span></div>
+            <div class="summary-item" style="display: flex; justify-content: space-between;">
+                <span class="summary-title">Total Transfer:</span>
+                <span>RM ${totalTransfer}</span>
+            </div>
+            <div class="summary-item" style="display: flex; justify-content: space-between;">
+                <span class="summary-title">Total Profit:</span>
+                <span>RM ${totalProfit}</span>
+            </div>
+            <div class="summary-item" style="display: flex; justify-content: space-between;">
+                <span class="summary-title">Total Transfer (Paid):</span>
+                <span>RM ${totalTransferPaid}</span>
+            </div>
+            <div class="summary-item" style="display: flex; justify-content: space-between;">
+                <span class="summary-title">Total Transfer (Pending):</span>
+                <span>RM ${totalTransferPending}</span>
+            </div>
+            <div class="summary-item" style="display: flex; justify-content: space-between;">
+                <span class="summary-title">Total Profit (Paid):</span>
+                <span>RM ${totalProfitPaid}</span>
+            </div>
+            <div class="summary-item" style="display: flex; justify-content: space-between;">
+                <span class="summary-title">Total Profit (Pending):</span>
+                <span>RM ${totalProfitPending}</span>
+            </div>
             ${statusCountsHtml}
         `;
     };
@@ -142,18 +170,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('date').valueAsDate = new Date(); // Reset date to today
     });
 
-    window.editProfit = (index) => {
-        const profit = profits[index];
+    // Open modal for the correct row, using the global index
+    window.openModalForRow = (globalIndex) => {
+        const profit = profits[globalIndex];
         document.getElementById('updateName').value = profit.name;
         document.getElementById('updateTransfer').value = parseFloat(profit.transfer).toFixed(2);
         document.getElementById('updateProfit').value = parseFloat(profit.profit).toFixed(2);
         document.getElementById('updateStatus').value = profit.status;
         document.getElementById('updateDate').value = profit.date;
-        editIndex = index;
-        const updateProfitModal = new bootstrap.Modal(document.getElementById('updateProfitModal'));
-        updateProfitModal.show();
+
+        // Update the global editIndex to be used for update or delete actions
+        editIndex = globalIndex;
+
+        // Show the modal for updating or deleting
+        const rowModal = new bootstrap.Modal(document.getElementById('updateProfitModal'));
+        rowModal.show();
     };
 
+    // Save the updated profit data
     document.getElementById('saveUpdate').addEventListener('click', () => {
         const name = document.getElementById('updateName').value;
         const transfer = parseFloat(document.getElementById('updateTransfer').value).toFixed(2);
@@ -162,25 +196,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = document.getElementById('updateDate').value;
 
         if (editIndex !== -1) {
+            // Update the profit at the correct global index
             profits[editIndex] = { name, transfer, profit, status, date };
-            saveProfits();
-            renderTable(document.getElementById('searchName').value.toLowerCase());
-            editIndex = -1;
-            const updateProfitModal = bootstrap.Modal.getInstance(document.getElementById('updateProfitModal'));
-            updateProfitModal.hide();
+            saveProfits();  // Save the updated profits list to local storage
+            renderTable(document.getElementById('searchName').value.toLowerCase());  // Re-render the table
+            editIndex = -1;  // Reset the edit index
+
+            // Hide the modal after saving the update
+            const rowModal = bootstrap.Modal.getInstance(document.getElementById('updateProfitModal'));
+            rowModal.hide();
         }
     });
 
-    window.deleteProfit = (index) => {
-        profits.splice(index, 1);
-        saveProfits();
-        renderTable();
-    };
+    // Delete the profit based on the correct global index
+    document.getElementById('deleteProfit').addEventListener('click', () => {
+        if (editIndex !== -1) {
+            profits.splice(editIndex, 1);  // Remove the correct profit by global index
+            saveProfits();                 // Save the updated list to local storage
+            renderTable();                 // Re-render the table with the updated data
 
+            // Hide the modal after deletion
+            const rowModal = bootstrap.Modal.getInstance(document.getElementById('updateProfitModal'));
+            rowModal.hide();
+        }
+    });
+
+    // Show the modal when "Delete All" is clicked
     deleteAllButton.addEventListener('click', () => {
+        const deleteAllModal = new bootstrap.Modal(document.getElementById('deleteAllModal'));
+        deleteAllModal.show();
+    });
+
+    // Handle the confirmation of the delete action
+    document.getElementById('confirmDeleteAll').addEventListener('click', () => {
         profits = [];
         saveProfits();
         renderTable();
+
+        // Hide the modal after deletion
+        const deleteAllModal = bootstrap.Modal.getInstance(document.getElementById('deleteAllModal'));
+        deleteAllModal.hide();
     });
 
     document.getElementById('importExcel').addEventListener('click', () => {
