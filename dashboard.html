@@ -20,11 +20,33 @@
     </nav>
 
     <div class="container mt-header mb-footer">
-        <div id="summaryCard" class="card mt-3 mb-4">
-            <div class="chart-container" style="position: relative; width: 98%">
+        <div class="d-flex justify-content-center mt-3 mb-4">
+            <div class="btn-group w-50 btn-lg">
+                <button class="btn btn-primary  dropdown-toggle" type="button" id="monthDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Month
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="monthDropdown" id="monthDropdownMenu">
+                <!-- Month options will be dynamically generated -->
+                </ul>
+            </div>
+
+
+            <div class="btn-group w-50 btn-lg">
+                <button class="btn btn-primary  dropdown-toggle" type="button" id="yearDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Year
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="yearDropdown" id="yearDropdownMenu">
+                <!-- Year options will be dynamically generated -->
+                </ul>
+            </div>
+        </div>
+
+        <div id="summaryCard" class="card mt-3 mb-3">
+            <div class="card-body">
                 <canvas id="profitChart"></canvas>
             </div>
         </div>
+
         <div id="summaryCard" class="card mt-3 mb-3">
             <div class="card-body">
                 <div id="summary"></div>
@@ -53,9 +75,77 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const summaryDiv = document.getElementById('summary');
+            const chartCanvas = document.getElementById('profitChart').getContext('2d');
+            const monthDropdownButton = document.getElementById('monthDropdown');
+            const yearDropdownButton = document.getElementById('yearDropdown');
+            const monthDropdownMenu = document.getElementById('monthDropdownMenu');
+            const yearDropdownMenu = document.getElementById('yearDropdownMenu');
+
+            let profitChart; // Variable to hold the chart instance
+            let selectedMonth, selectedYear; // Track the selected month and year
 
             // Fetch profits from localStorage
             let profits = JSON.parse(localStorage.getItem('profits')) || [];
+
+            // Get the current month and year
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            // Populate month dropdown
+            const months = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+
+            months.forEach((month, index) => {
+                const monthItem = document.createElement('li');
+                monthItem.innerHTML = `<a class="dropdown-item" href="#">${month}</a>`;
+                monthItem.onclick = () => {
+                selectedMonth = index; // Set the selected month index
+                monthDropdownButton.textContent = month; // Update the button text
+                renderProfitChart(); // Re-render the chart
+                };
+                monthDropdownMenu.appendChild(monthItem);
+            });
+
+            // Populate year dropdown
+            const renderYearOptions = () => {
+                const years = new Set(profits.map(profit => new Date(profit.date).getFullYear()));
+                yearDropdownMenu.innerHTML = ''; // Clear previous options
+
+                years.forEach(year => {
+                const yearItem = document.createElement('li');
+                yearItem.innerHTML = `<a class="dropdown-item" href="#">${year}</a>`;
+                yearItem.onclick = () => {
+                    selectedYear = year; // Set the selected year
+                    yearDropdownButton.textContent = year; // Update the button text
+                    renderProfitChart(); // Re-render the chart
+                };
+                yearDropdownMenu.appendChild(yearItem);
+                });
+
+                // Add current year if not already in the data
+                if (!years.has(currentYear)) {
+                const currentYearItem = document.createElement('li');
+                currentYearItem.innerHTML = `<a class="dropdown-item" href="#">${currentYear}</a>`;
+                currentYearItem.onclick = () => {
+                    selectedYear = currentYear;
+                    yearDropdownButton.textContent = currentYear;
+                    renderProfitChart();
+                };
+                yearDropdownMenu.appendChild(currentYearItem);
+                }
+            };
+
+            // Call the function to render year options
+            renderYearOptions();
+
+            // Set default selected values (current month and year)
+            selectedMonth = currentMonth;
+            selectedYear = currentYear;
+            monthDropdownButton.textContent = months[currentMonth]; // Set initial month button text
+            yearDropdownButton.textContent = currentYear; // Set initial year button text
 
             const renderSummary = () => {
                 const totalTransfer = profits.reduce((sum, profit) => sum + parseFloat(profit.transfer), 0).toFixed(2);
@@ -125,15 +215,12 @@
 
             renderSummary(); // Call the function to render the summary when the page loads
 
-            // Function to render profit gain chart for the current month
+            // Function to render profit gain chart for the selected month and year
             const renderProfitChart = () => {
-                const currentMonth = new Date().getMonth();
-                const currentYear = new Date().getFullYear();
-
-                // Filter profits for the current month
+                // Filter profits for the selected month and year
                 const monthlyProfits = profits.filter(profit => {
                 const profitDate = new Date(profit.date);
-                return profitDate.getMonth() === currentMonth && profitDate.getFullYear() === currentYear;
+                return profitDate.getMonth() === selectedMonth && profitDate.getFullYear() === selectedYear;
                 });
 
                 // Aggregate total profit by date
@@ -150,9 +237,13 @@
                 const dates = Object.keys(dailyProfits).sort(); // Sort the dates
                 const profitData = dates.map(date => dailyProfits[date]);
 
+                // Destroy the old chart if it exists
+                if (profitChart) {
+                profitChart.destroy();
+                }
+
                 // Create the chart using Chart.js
-                const ctx = document.getElementById('profitChart').getContext('2d');
-                new Chart(ctx, {
+                profitChart = new Chart(chartCanvas, {
                 type: 'line',
                 data: {
                     labels: dates, // X-axis (dates)
@@ -185,8 +276,15 @@
                 });
             };
 
-            // Render the profit chart
+            // Render the profit chart for the initial current month/year
             renderProfitChart();
+        });
+
+        PullToRefresh.init({
+            mainElement: 'body', // Specify the main element
+            onRefresh: function() {
+                window.location.reload(); // Refresh the page
+            }
         });
     </script>
 
