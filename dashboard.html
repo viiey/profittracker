@@ -20,7 +20,16 @@
     </nav>
 
     <div class="container mt-header mb-footer">
-        <h1>Dashboard</h1>
+        <div id="summaryCard" class="card mt-3 mb-4">
+            <div class="chart-container" style="position: relative; width: 98%">
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
+        <div id="summaryCard" class="card mt-3 mb-3">
+            <div class="card-body">
+                <div id="summary"></div>
+            </div>
+        </div>
     </div>
 
     <nav class="navbar fixed-bottom">
@@ -38,9 +47,148 @@
     </nav>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    <script src="script.js"></script>
+    <!-- JavaScript to render summary -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const summaryDiv = document.getElementById('summary');
+
+            // Fetch profits from localStorage
+            let profits = JSON.parse(localStorage.getItem('profits')) || [];
+
+            const renderSummary = () => {
+                const totalTransfer = profits.reduce((sum, profit) => sum + parseFloat(profit.transfer), 0).toFixed(2);
+                const totalProfit = profits.reduce((sum, profit) => sum + parseFloat(profit.profit), 0).toFixed(2);
+
+                const totalTransferPaid = profits
+                    .filter(profit => profit.status === 'Paid')
+                    .reduce((sum, profit) => sum + parseFloat(profit.transfer), 0)
+                    .toFixed(2);
+
+                const totalTransferPending = profits
+                    .filter(profit => profit.status === 'Pending')
+                    .reduce((sum, profit) => sum + parseFloat(profit.transfer), 0)
+                    .toFixed(2);
+
+                const totalProfitPaid = profits
+                    .filter(profit => profit.status === 'Paid')
+                    .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
+                    .toFixed(2);
+
+                const totalProfitPending = profits
+                    .filter(profit => profit.status === 'Pending')
+                    .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
+                    .toFixed(2);
+
+                const statusCounts = profits.reduce((counts, profit) => {
+                    counts[profit.status] = (counts[profit.status] || 0) + 1;
+                    return counts;
+                }, {});
+
+                const statusCountsHtml = `
+                    <div class="summary-item"><span class="summary-title">Paid:</span> <span>${statusCounts['Paid'] || 0}</span></div>
+                    <div class="summary-item"><span class="summary-title">Pending:</span> <span>${statusCounts['Pending'] || 0}</span></div>
+                `;
+
+                let totalTransaction = (statusCounts['Paid'] || 0) + (statusCounts['Pending'] || 0);
+
+                summaryDiv.innerHTML = `
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Transfer:</span>
+                        <span>RM ${totalTransfer}</span>
+                    </div>
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Profit:</span>
+                        <span>RM ${totalProfit}</span>
+                    </div>
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Transfer (Paid):</span>
+                        <span>RM ${totalTransferPaid}</span>
+                    </div>
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Transfer (Pending):</span>
+                        <span>RM ${totalTransferPending}</span>
+                    </div>
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Profit (Paid):</span>
+                        <span>RM ${totalProfitPaid}</span>
+                    </div>
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Profit (Pending):</span>
+                        <span>RM ${totalProfitPending}</span>
+                    </div>
+                    ${statusCountsHtml}
+                    <div class="summary-item"><span class="summary-title">Total Transaction:</span> <span>${totalTransaction}</span></div>
+                `;
+            };
+
+            renderSummary(); // Call the function to render the summary when the page loads
+
+            // Function to render profit gain chart for the current month
+            const renderProfitChart = () => {
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+
+                // Filter profits for the current month
+                const monthlyProfits = profits.filter(profit => {
+                const profitDate = new Date(profit.date);
+                return profitDate.getMonth() === currentMonth && profitDate.getFullYear() === currentYear;
+                });
+
+                // Aggregate total profit by date
+                const dailyProfits = {};
+                monthlyProfits.forEach(profit => {
+                const date = profit.date;
+                if (!dailyProfits[date]) {
+                    dailyProfits[date] = 0;
+                }
+                dailyProfits[date] += parseFloat(profit.profit);
+                });
+
+                // Prepare data for the chart
+                const dates = Object.keys(dailyProfits).sort(); // Sort the dates
+                const profitData = dates.map(date => dailyProfits[date]);
+
+                // Create the chart using Chart.js
+                const ctx = document.getElementById('profitChart').getContext('2d');
+                new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates, // X-axis (dates)
+                    datasets: [{
+                    label: 'Total Profit Gain (RM)',
+                    data: profitData, // Y-axis (profit values)
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: true
+                    }]
+                },
+                options: {
+                    scales: {
+                    x: {
+                        title: {
+                        display: true,
+                        text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                        display: true,
+                        text: 'Profit (RM)'
+                        },
+                        beginAtZero: true
+                    }
+                    }
+                }
+                });
+            };
+
+            // Render the profit chart
+            renderProfitChart();
+        });
+    </script>
 
 </body>
 

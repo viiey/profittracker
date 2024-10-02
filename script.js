@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Re-render pagination and summary
         renderPagination(filteredProfits.length);  // Total items in the filtered list
-        renderSummary(filteredProfits);  // Only filtered profits for summary
     };
 
     const renderPagination = (totalItems = profits.length) => {
@@ -144,69 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             paginationDiv.appendChild(nextButton);
         }
-    };
-
-    const renderSummary = () => {
-        const totalTransfer = profits.reduce((sum, profit) => sum + parseFloat(profit.transfer), 0).toFixed(2);
-        const totalProfit = profits.reduce((sum, profit) => sum + parseFloat(profit.profit), 0).toFixed(2);
-
-        const totalTransferPaid = profits
-            .filter(profit => profit.status === 'Paid')
-            .reduce((sum, profit) => sum + parseFloat(profit.transfer), 0)
-            .toFixed(2);
-
-        const totalTransferPending = profits
-            .filter(profit => profit.status === 'Pending')
-            .reduce((sum, profit) => sum + parseFloat(profit.transfer), 0)
-            .toFixed(2);
-
-        const totalProfitPaid = profits
-            .filter(profit => profit.status === 'Paid')
-            .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
-            .toFixed(2);
-
-        const totalProfitPending = profits
-            .filter(profit => profit.status === 'Pending')
-            .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
-            .toFixed(2);
-
-        const statusCounts = profits.reduce((counts, profit) => {
-            counts[profit.status] = (counts[profit.status] || 0) + 1;
-            return counts;
-        }, {});
-
-        const statusCountsHtml = `
-            <div class="summary-item"><span class="summary-title">Paid:</span> <span>${statusCounts['Paid'] || 0}</span></div>
-            <div class="summary-item"><span class="summary-title">Pending:</span> <span>${statusCounts['Pending'] || 0}</span></div>
-        `;
-
-        summaryDiv.innerHTML = `
-            <div class="summary-item" style="display: flex; justify-content: space-between;">
-                <span class="summary-title">Total Transfer:</span>
-                <span>RM ${totalTransfer}</span>
-            </div>
-            <div class="summary-item" style="display: flex; justify-content: space-between;">
-                <span class="summary-title">Total Profit:</span>
-                <span>RM ${totalProfit}</span>
-            </div>
-            <div class="summary-item" style="display: flex; justify-content: space-between;">
-                <span class="summary-title">Total Transfer (Paid):</span>
-                <span>RM ${totalTransferPaid}</span>
-            </div>
-            <div class="summary-item" style="display: flex; justify-content: space-between;">
-                <span class="summary-title">Total Transfer (Pending):</span>
-                <span>RM ${totalTransferPending}</span>
-            </div>
-            <div class="summary-item" style="display: flex; justify-content: space-between;">
-                <span class="summary-title">Total Profit (Paid):</span>
-                <span>RM ${totalProfitPaid}</span>
-            </div>
-            <div class="summary-item" style="display: flex; justify-content: space-between;">
-                <span class="summary-title">Total Profit (Pending):</span>
-                <span>RM ${totalProfitPending}</span>
-            </div>
-            ${statusCountsHtml}
-        `;
     };
 
     const saveProfits = () => {
