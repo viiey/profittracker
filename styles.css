@@ -47,3 +47,27 @@ button.update, button.delete {
     border-bottom: none;
 }
 
+.navbar {
+    background-color: #007bff;
+}
+
+.navbar-brand  {
+    color: white;
+    font-weight: bold;
+}
+
+.nav-link {
+    color: white;
+    font-weight: bold;
+    flex-grow: 1;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.mt-header {
+    margin-top: 58px; /* Adjust this value based on your navbar height */
+}
+
+.mb-footer {
+    margin-bottom: 54px; /* Adjust this value based on your footer height */
+}
