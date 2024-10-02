@@ -65,7 +65,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderPagination = (totalItems = profits.length) => {
         paginationDiv.innerHTML = '';
         const pageCount = Math.ceil(totalItems / itemsPerPage);
-        for (let i = 1; i <= pageCount; i++) {
+
+        const maxVisibleButtons = 5; // Number of pagination buttons to show
+        const firstPage = Math.max(1, currentPage - 2); // Start page for pagination
+        const lastPage = Math.min(pageCount, currentPage + 2); // End page for pagination
+
+        // Add previous button
+        if (currentPage > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Prev';
+            prevButton.className = 'btn btn-secondary btn-sm mx-1';
+            prevButton.onclick = () => {
+                currentPage -= 1;
+                renderTable(document.getElementById('searchName').value.toLowerCase());
+            };
+            paginationDiv.appendChild(prevButton);
+        }
+
+        // Add first page and ellipsis if necessary
+        if (firstPage > 1) {
+            const firstButton = document.createElement('button');
+            firstButton.textContent = '1';
+            firstButton.className = 'btn btn-secondary btn-sm mx-1';
+            firstButton.onclick = () => {
+                currentPage = 1;
+                renderTable(document.getElementById('searchName').value.toLowerCase());
+            };
+            paginationDiv.appendChild(firstButton);
+
+            if (firstPage > 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                paginationDiv.appendChild(ellipsis);
+            }
+        }
+
+        // Add page buttons within the range
+        for (let i = firstPage; i <= lastPage; i++) {
             const pageButton = document.createElement('button');
             pageButton.textContent = i;
             pageButton.className = 'btn btn-secondary btn-sm mx-1';
@@ -77,6 +113,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 pageButton.disabled = true;
             }
             paginationDiv.appendChild(pageButton);
+        }
+
+        // Add last page and ellipsis if necessary
+        if (lastPage < pageCount) {
+            if (lastPage < pageCount - 1) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                paginationDiv.appendChild(ellipsis);
+            }
+
+            const lastButton = document.createElement('button');
+            lastButton.textContent = pageCount;
+            lastButton.className = 'btn btn-secondary btn-sm mx-1';
+            lastButton.onclick = () => {
+                currentPage = pageCount;
+                renderTable(document.getElementById('searchName').value.toLowerCase());
+            };
+            paginationDiv.appendChild(lastButton);
+        }
+
+        // Add next button
+        if (currentPage < pageCount) {
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.className = 'btn btn-secondary btn-sm mx-1';
+            nextButton.onclick = () => {
+                currentPage += 1;
+                renderTable(document.getElementById('searchName').value.toLowerCase());
+            };
+            paginationDiv.appendChild(nextButton);
         }
     };
 
