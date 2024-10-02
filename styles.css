@@ -51,6 +51,14 @@ button.update, button.delete {
     background-color: #007bff;
 }
 
+.fixed-top {
+    height: 60px; /* Adjust this value to increase the navbar height */
+}
+
+.fixed-bottom {
+    height: 80px; /* Adjust this value to increase the navbar height */
+}
+
 .navbar-brand  {
     color: white;
     font-weight: bold;
@@ -65,9 +73,9 @@ button.update, button.delete {
 }
 
 .mt-header {
-    margin-top: 58px; /* Adjust this value based on your navbar height */
+    margin-top: 59px; /* Adjust this value based on your navbar height */
 }
 
 .mb-footer {
-    margin-bottom: 54px; /* Adjust this value based on your footer height */
+    margin-bottom: 79px; /* Adjust this value based on your footer height */
 }
