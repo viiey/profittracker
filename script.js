@@ -260,5 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('refreshButton').addEventListener('click', function() {
+        location.reload();
+    });
+
     renderTable();
 });
