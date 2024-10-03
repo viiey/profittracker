@@ -23,27 +23,29 @@
     </nav>
 
     <div class="container mt-header mb-footer d-flex justify-content-center align-items-center" style="min-height: 83.5vh;">
-        <form id="profitForm" class="mt-3 mb-4">
-            <div class="mb-3">
-                <input type="text" id="name" class="form-control" placeholder="Name" required>
-            </div>
-            <div class="mb-3">
-                <input type="number" id="transfer" class="form-control" placeholder="Transfer" step="0.01" required>
-            </div>
-            <div class="mb-3">
-                <input type="number" id="profit" class="form-control" placeholder="Profit" step="0.01" required>
-            </div>
-            <div class="mb-3">
-                <select id="status" class="form-control" required>
-                    <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <input type="date" id="date" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 btn-lg">Add Profit</button>
-        </form>
+        <div id="summaryCard" class="card justify-content-center align-items-center" style="width: 100%;">
+            <form id="profitForm" class="mt-5 mb-5" style="width: 80%;">
+                <div class="mb-3">
+                    <input type="text" id="name" class="form-control" placeholder="Name" required>
+                </div>
+                <div class="mb-3">
+                    <input type="number" id="transfer" class="form-control" placeholder="Transfer" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                    <input type="number" id="profit" class="form-control" placeholder="Profit" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                    <select id="status" class="form-control" required>
+                        <option value="Paid">Paid</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <input type="date" id="date" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg">Add Profit</button>
+            </form>
+        </div>
     </div>
 
     <nav class="navbar fixed-bottom">
