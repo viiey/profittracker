@@ -339,38 +339,38 @@
         });
     </script>
     <script>
-        $(document).ready(function() {
-            $('.nav-link').click(function(e) {
-                e.preventDefault(); // Prevent the default link behavior
+$(document).ready(function() {
+  $('.nav-link').click(function(e) {
+    e.preventDefault(); // Prevent the default link behavior
 
-                var url = $(this).attr('href'); // Get the URL to load
+    var url = $(this).attr('href'); // Get the URL to load
 
-                // Start the slide-out effect
-                $('#content').addClass('slide-out-left');
+    // Start the slide-out effect
+    $('#content').addClass('slide-out-left');
 
-                // Wait for the slide-out effect to finish before loading new content
-                setTimeout(function() {
-                    // Load the new content off-screen to the right
-                    $('#content').load(url + ' #content', function(response, status, xhr) {
-                        if (status == "error") {
-                        console.log("Error loading page: " + xhr.status + " " + xhr.statusText);
-                        return;
-                        }
-                        // Position new content off-screen to the right
-                        $('#content').addClass('slide-in-right');
-                        // Trigger reflow for transition
-                        $('#content')[0].offsetWidth;
-                        // Slide new content into view
-                        $('#content').removeClass('slide-in-right');
-                        // Clean up classes after transition
-                        setTimeout(function() {
-                        $('#content').removeClass('slide-out-left');
-                        }, 500); // This timeout should match the CSS transition duration
-                    });
-                }, 500); // This timeout should match the CSS transition duration
-            });
-        });
-    </script>
+    // Wait for the slide-out effect to finish before loading new content
+    setTimeout(function() {
+      // Load the new content off-screen to the right
+      $.get(url, function(data) {
+        // Replace the content with new data
+        var newContent = $(data).find('#content').html();
+        $('#content').html(newContent);
+
+        // Position new content off-screen to the right
+        $('#content').addClass('slide-in-right');
+        // Trigger reflow for transition
+        $('#content')[0].offsetWidth;
+        // Slide new content into view
+        $('#content').removeClass('slide-in-right');
+        // Clean up classes after transition
+        setTimeout(function() {
+          $('#content').removeClass('slide-out-left');
+        }, 500); // This timeout should match the CSS transition duration
+      });
+    }, 500); // This timeout should match the CSS transition duration
+  });
+});
+</script>
 
 </body>
 
