@@ -21,8 +21,7 @@
             </button>
         </div>
     </nav>
-<div id="content-wrapper">
-  <div id="content">
+<div class="page active">
     <div class="container mt-header mb-footer">
         <div class="d-flex justify-content-center mt-3 mb-4">
             <input type="text" id="searchName" class="form-control w-100 mt-2" placeholder="Search by Name or Status">
@@ -48,7 +47,6 @@
             <button type="button" id="importExcel" class="btn btn-success w-50 btn-lg">Export Excel</button>
         </div>
     </div>
-</div>
 </div>
     <!-- Update Profit Modal -->
     <div class="modal fade" id="updateProfitModal" tabindex="-1" aria-labelledby="updateProfitModalLabel" aria-hidden="true">
@@ -415,38 +413,111 @@
         });
     </script>
     <script>
-$(document).ready(function() {
-  $('.nav-link').click(function(e) {
-    e.preventDefault(); // Prevent the default link behavior
+    let isDataLoaded = false;
 
-    var url = $(this).attr('href'); // Get the URL to load
+    // Function to navigate with appropriate sliding effect
+    function navigateToPage(targetPage, currentPage) {
+        const currentPageElement = document.querySelector('.page.active');
 
-    // Start the slide-out effect
-    $('#content').addClass('slide-out-left');
+        // Determine the direction of the slide based on navigation flow
+        let slideOutClass = 'exit-to-right'; // Default slide-out direction (left to right)
+        let slideInClass = 'enter-from-left'; // Default slide-in direction (right to left)
 
-    // Wait for the slide-out effect to finish before loading new content
-    setTimeout(function() {
-      // Load the new content off-screen to the right
-      $.get(url, function(data) {
-        // Replace the content with new data
-        var newContent = $(data).find('#content').html();
-        $('#content').html(newContent);
+        if (targetPage === 'index.html' && currentPage === 'dashboard.html' ||
+            targetPage === 'dashboard.html' && currentPage === 'data.html') {
+            slideOutClass = 'exit-to-left'; // Right to left when going forward
+            slideInClass = 'enter-from-right'; // Slide-in from right
+        } else if (targetPage === 'dashboard.html' && currentPage === 'index.html' ||
+                   targetPage === 'data.html' && currentPage === 'dashboard.html') {
+            slideOutClass = 'exit-to-right'; // Left to right when going backward
+            slideInClass = 'enter-from-left'; // Slide-in from left
+        }
 
-        // Position new content off-screen to the right
-        $('#content').addClass('slide-in-right');
-        // Trigger reflow for transition
-        $('#content')[0].offsetWidth;
-        // Slide new content into view
-        $('#content').removeClass('slide-in-right');
-        // Clean up classes after transition
-        setTimeout(function() {
-          $('#content').removeClass('slide-out-left');
-        }, 500); // This timeout should match the CSS transition duration
-      });
-    }, 500); // This timeout should match the CSS transition duration
-  });
-});
+        // Load the target page content first, then trigger the sliding effect
+        loadPageData(targetPage).then(() => {
+            // After loading data, perform slide-out effect on current page
+            currentPageElement.classList.add(slideOutClass);
+            currentPageElement.classList.remove('active');
+
+            setTimeout(() => {
+                // Perform the navigation
+                window.location.href = targetPage;
+            }, 800); // Delay navigation to match the sliding-out effect
+        });
+    }
+
+    // Event listener for DOMContentLoaded to handle page load and transition
+    window.addEventListener('DOMContentLoaded', () => {
+        const newPageElement = document.querySelector('.page');
+
+        // Once data is loaded, trigger the slide-in effect
+        if (!isDataLoaded) {
+            loadDataForPage().then(() => {
+                // After data is loaded, activate the slide-in effect
+                newPageElement.classList.add('enter-from-left');
+                setTimeout(() => {
+                    newPageElement.classList.add('active');
+                    newPageElement.classList.remove('enter-from-left', 'enter-from-right');
+                }, 800); // Wait for the transition to complete before removing slide classes
+            });
+        }
+    });
+
+    // Function to load page-specific data
+    function loadDataForPage() {
+        return new Promise((resolve) => {
+            if (window.location.pathname.includes("index.html")) {
+                console.log("Loading data for Index page...");
+                // Fetch or process data for index.html
+            } else if (window.location.pathname.includes("dashboard.html")) {
+                console.log("Loading data for Dashboard page...");
+                // Fetch or process data for dashboard.html
+            } else if (window.location.pathname.includes("data.html")) {
+                console.log("Loading data for Data page...");
+                // Fetch or process data for data.html
+            }
+
+            setTimeout(() => {
+                isDataLoaded = true;
+                resolve();
+            }, 500); // Simulated loading delay (adjust accordingly)
+        });
+    }
+
+    // Function to load the page content before the transition
+    function loadPageData(targetPage) {
+        return new Promise((resolve) => {
+            console.log("Preloading data for " + targetPage);
+
+            // Simulate the page content loading (this could be an AJAX call, for example)
+            setTimeout(() => {
+                resolve();
+            }, 500); // Simulate data load time before sliding
+        });
+    }
+
+    // Event listener for navigation links
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelector('.nav-link[href="index.html"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateToPage('index.html', 'dashboard.html'); // Adjust based on current page
+        });
+
+        document.querySelector('.nav-link[href="dashboard.html"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentPage = window.location.pathname.includes('index.html') ? 'index.html' : 'data.html';
+            navigateToPage('dashboard.html', currentPage); // Adjust based on current page
+        });
+
+        document.querySelector('.nav-link[href="data.html"]').addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateToPage('data.html', 'dashboard.html'); // Adjust based on current page
+        });
+    });
 </script>
+
+
+
 
 </body>
 

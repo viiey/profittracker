@@ -1,6 +1,9 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 .container {
@@ -111,22 +114,50 @@ button.update, button.delete {
     min-height: 100vh; /* Full height */
 }
 
-#content-wrapper {
-  overflow: hidden;
-  position: relative;
+/* CSS for smooth sliding transitions */
+.page {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: transform 0.8s ease-in-out;
+    opacity: 1;
+    visibility: visible;
 }
 
-#content {
-  position: absolute;
-  width: 100%;
-  left: 0;
-  transition: left 0.5s ease-in-out;
+/* Slide out to the right (left to right transition) */
+.exit-to-right {
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: hidden;
 }
 
-.slide-out-left {
-  left: -100%;
+/* Slide out to the left (right to left transition) */
+.exit-to-left {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
 }
 
-.slide-in-right {
-  left: 100%;
+/* Slide in from the left (right to left transition) */
+.enter-from-left {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: visible;
 }
+
+/* Slide in from the right (left to right transition) */
+.enter-from-right {
+    transform: translateX(100%);
+    opacity: 0;
+    visibility: visible;
+}
+
+/* When active, reset transforms */
+.page.active {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+}
+
