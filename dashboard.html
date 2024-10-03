@@ -292,6 +292,42 @@
             document.getElementById('refreshButton').addEventListener('click', function() {
                 location.reload();
             });
+
+            // New Preloading Logic for Other Pages
+            const currentPage = window.location.pathname.split('/').pop(); // Get current page file name
+
+            // Preload the pages based on the current page
+            switch (currentPage) {
+                case 'index.html':
+                    preloadPage('dashboard.html');
+                    preloadPage('data.html');
+                    break;
+                case 'dashboard.html':
+                    preloadPage('index.html');
+                    preloadPage('data.html');
+                    break;
+                case 'data.html':
+                    preloadPage('index.html');
+                    preloadPage('dashboard.html');
+                    break;
+                default:
+                    // No specific case needed
+                    break;
+            }
+
+            // Function to preload a page in the background
+            function preloadPage(url) {
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to load ${url}`);
+                        }
+                        return response.text(); // Get the page content as text (HTML)
+                    })
+                    .catch(error => {
+                        console.error(`Error preloading ${url}:`, error);
+                    });
+            }
         });
     </script>
 
