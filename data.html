@@ -21,7 +21,8 @@
             </button>
         </div>
     </nav>
-
+<div id="content-wrapper">
+  <div id="content">
     <div class="container mt-header mb-footer">
         <div class="d-flex justify-content-center mt-3 mb-4">
             <input type="text" id="searchName" class="form-control w-100 mt-2" placeholder="Search by Name or Status">
@@ -47,7 +48,8 @@
             <button type="button" id="importExcel" class="btn btn-success w-50 btn-lg">Export Excel</button>
         </div>
     </div>
-
+</div>
+</div>
     <!-- Update Profit Modal -->
     <div class="modal fade" id="updateProfitModal" tabindex="-1" aria-labelledby="updateProfitModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -410,6 +412,39 @@
                         console.error(`Error preloading ${url}:`, error);
                     });
             }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('.nav-link').click(function(e) {
+                e.preventDefault(); // Prevent the default link behavior
+
+                var url = $(this).attr('href'); // Get the URL to load
+
+                // Start the slide-out effect
+                $('#content').addClass('slide-out-left');
+
+                // Wait for the slide-out effect to finish before loading new content
+                setTimeout(function() {
+                    // Load the new content off-screen to the right
+                    $('#content').load(url + ' #content', function(response, status, xhr) {
+                        if (status == "error") {
+                        console.log("Error loading page: " + xhr.status + " " + xhr.statusText);
+                        return;
+                        }
+                        // Position new content off-screen to the right
+                        $('#content').addClass('slide-in-right');
+                        // Trigger reflow for transition
+                        $('#content')[0].offsetWidth;
+                        // Slide new content into view
+                        $('#content').removeClass('slide-in-right');
+                        // Clean up classes after transition
+                        setTimeout(function() {
+                        $('#content').removeClass('slide-out-left');
+                        }, 500); // This timeout should match the CSS transition duration
+                    });
+                }, 500); // This timeout should match the CSS transition duration
+            });
         });
     </script>
 
