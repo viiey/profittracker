@@ -88,3 +88,25 @@ button.update, button.delete {
     padding-top: 12px;
     padding-bottom: 12px;
 }
+
+.calculator .btn {
+    width: 100%;
+    height: 60px; /* Standard height for all buttons */
+    font-size: 1.5rem; /* Standard font size */
+}
+.calculator input {
+    font-size: 2rem; /* Larger font size for input */
+    text-align: right;
+    height: 60px; /* Height for the input */
+    margin-bottom: 15px; /* Space below input */
+}
+.btn-equal {
+    height: 125px; /* Height for equal button */
+}
+/* Center the modal on the screen */
+.modal-dialog {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Full height */
+}

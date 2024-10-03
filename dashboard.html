@@ -285,11 +285,15 @@
             PullToRefresh.init({
                 mainElement: 'body', // Specify the main element
                 onRefresh: function() {
+                    preloadPage('index.html');
+                    preloadPage('data.html');
                     window.location.reload(); // Refresh the page
                 }
             });
 
             document.getElementById('refreshButton').addEventListener('click', function() {
+                preloadPage('index.html');
+                preloadPage('data.html');
                 location.reload();
             });
 

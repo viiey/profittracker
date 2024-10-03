@@ -303,6 +303,9 @@
                     // Hide the modal after saving the update
                     const rowModal = bootstrap.Modal.getInstance(document.getElementById('updateProfitModal'));
                     rowModal.hide();
+
+                    preloadPage('index.html');
+                    preloadPage('dashboard.html');
                 }
             });
 
@@ -316,6 +319,9 @@
                     // Hide the modal after deletion
                     const rowModal = bootstrap.Modal.getInstance(document.getElementById('updateProfitModal'));
                     rowModal.hide();
+
+                    preloadPage('index.html');
+                    preloadPage('dashboard.html');
                 }
             });
 
@@ -334,6 +340,9 @@
                 // Hide the modal after deletion
                 const deleteAllModal = bootstrap.Modal.getInstance(document.getElementById('deleteAllModal'));
                 deleteAllModal.hide();
+
+                preloadPage('index.html');
+                preloadPage('dashboard.html');
             });
 
             document.getElementById('importExcel').addEventListener('click', () => {
@@ -354,11 +363,15 @@
             PullToRefresh.init({
                 mainElement: 'body', // Specify the main element
                 onRefresh: function() {
+                    preloadPage('index.html');
+                    preloadPage('dashboard.html');
                     window.location.reload(); // Refresh the page
                 }
             });
 
             document.getElementById('refreshButton').addEventListener('click', function() {
+                preloadPage('index.html');
+                preloadPage('dashboard.html');
                 location.reload();
             });
 
