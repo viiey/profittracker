@@ -112,10 +112,10 @@
             });
 
             // New Preloading Logic for Other Pages
-            const currentPage = window.location.pathname.split('/').pop(); // Get current page file name
+            const currentHTML = window.location.pathname.split('/').pop(); // Get current page file name
 
             // Preload the pages based on the current page
-            switch (currentPage) {
+            switch (currentHTML) {
                 case 'index.html':
                     preloadPage('dashboard.html');
                     preloadPage('data.html');
