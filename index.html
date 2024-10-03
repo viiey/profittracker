@@ -98,61 +98,19 @@
                 saveProfits();
                 profitForm.reset();
                 document.getElementById('date').valueAsDate = new Date(); // Reset date to today
-
-                loadPage('dashboard.html');
-                loadPage('data.html');
             });
 
             PullToRefresh.init({
                 mainElement: 'body', // Specify the main element
                 onRefresh: function() {
-                    loadPage('dashboard.html');
-                    loadPage('data.html');
                     window.location.reload(); // Refresh the page
                 }
             });
 
             document.getElementById('refreshButton').addEventListener('click', function() {
-                loadPage('dashboard.html');
-                loadPage('data.html');
                 location.reload();
             });
-
-            // Check which page we are on and perform the appropriate action
-            const currentPage = getCurrentPage();
-
-            if (currentPage === 'index.html') {
-                loadPage('dashboard.html');
-                loadPage('data.html');
-            } else if (currentPage === 'dashboard.html') {
-                loadPage('index.html');
-                loadPage('data.html');
-            } else if (currentPage === 'data.html') {
-                loadPage('index.html');
-                loadPage('dashboard.html');
-            }
         });
-
-        function loadPage(url) {
-            fetch(url)
-                .then(response => response.text())
-                .then(html => {
-                    // Replace the entire document body with the fetched content
-                    document.open();
-                    document.write(html);
-                    document.close();
-
-                    // Update the browser history to reflect the new page
-                    window.history.pushState({}, '', url);
-                })
-                .catch(error => console.warn('Error loading page:', error));
-        }
-
-        // Helper function to get the current page
-        function getCurrentPage() {
-            const path = window.location.pathname;
-            return path.substring(path.lastIndexOf('/') + 1);
-        }
     </script>
 
 </body>
