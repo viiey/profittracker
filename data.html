@@ -144,10 +144,8 @@
                 profitTableBody.innerHTML = '';  // Clear table before rendering
 
                 // Filter based on search term
-                const filteredProfits = profits.filter(profit =>
-                    profit.name.toLowerCase().includes(searchTerm) ||
-                    profit.status.toLowerCase().includes(searchTerm)
-                );
+                const filteredProfits = profits.map((profit, originalIndex) => ({ ...profit, originalIndex }))
+                    .filter(profit => profit.name.toLowerCase().includes(searchTerm) || profit.status.toLowerCase().includes(searchTerm));
 
                 // Ensure pagination variables are correct
                 const start = (currentPage - 1) * itemsPerPage;
@@ -173,8 +171,8 @@
                         <td>${profit.status}</td>
                         <td>${profit.date}</td>
                     `;
-                    // Add click event to the row
-                    row.onclick = () => openModalForRow(start + index);  // Use start + index to ensure global index
+                    // Add click event to the row, using original index
+                    row.onclick = () => openModalForRow(profit.originalIndex);  // Use the original index
                     profitTableBody.appendChild(row);
                 });
 
