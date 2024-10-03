@@ -125,6 +125,47 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // New Preloading Logic for Other Pages
+            const currentPage = window.location.pathname.split('/').pop(); // Get current page file name
+
+            // Preload the pages based on the current page
+            switch (currentPage) {
+                case 'index.html':
+                    preloadPage('dashboard.html');
+                    preloadPage('data.html');
+                    break;
+                case 'dashboard.html':
+                    preloadPage('index.html');
+                    preloadPage('data.html');
+                    break;
+                case 'data.html':
+                    preloadPage('index.html');
+                    preloadPage('dashboard.html');
+                    break;
+                default:
+                    // No specific case needed
+                    break;
+            }
+
+            // Function to preload a page in the background
+            function preloadPage(url) {
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to load ${url}`);
+                        }
+                        return response.text(); // Get the page content as text (HTML)
+                    })
+                    .then(html => {
+                        console.log(`${url} preloaded.`);
+                        // Optionally, store preloaded HTML in memory for future use
+                        sessionStorage.setItem(url, html); // Store in sessionStorage if you need to cache it
+                    })
+                    .catch(error => {
+                        console.error(`Error preloading ${url}:`, error);
+                    });
+            }
+
             const profitTableBody = document.querySelector('#profitTable tbody');
             const paginationDiv = document.getElementById('pagination');
             const deleteAllButton = document.getElementById('deleteAll');
@@ -349,6 +390,8 @@
                 XLSX.writeFile(workbook, filename);
             });
 
+            renderTable();
+
             PullToRefresh.init({
                 mainElement: 'body', // Specify the main element
                 onRefresh: function() {
@@ -359,8 +402,6 @@
             document.getElementById('refreshButton').addEventListener('click', function() {
                 location.reload();
             });
-
-            renderTable();
         });
     </script>
 
