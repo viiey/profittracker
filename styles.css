@@ -79,3 +79,12 @@ button.update, button.delete {
 .mb-footer {
     margin-bottom: 79px; /* Adjust this value based on your footer height */
 }
+
+.small-font {
+    font-size: 0.865rem;
+}
+
+.spaced-rows tbody tr td {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
