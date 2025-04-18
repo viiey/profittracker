@@ -202,6 +202,17 @@
 
                 let totalTransaction = (statusCounts['Paid'] || 0) + (statusCounts['Pending'] || 0);
 
+                // Add new calculations for half-month periods
+                const totalProfitFirstHalf = filteredProfits
+                    .filter(profit => new Date(profit.date).getDate() <= 15)
+                    .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
+                    .toFixed(2);
+                
+                const totalProfitSecondHalf = filteredProfits
+                    .filter(profit => new Date(profit.date).getDate() >= 16)
+                    .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
+                    .toFixed(2);
+
                 container.innerHTML = `
                     <div class="summary-item" style="display: flex; justify-content: space-between;">
                         <span class="summary-title">Total Transfer:</span>
@@ -210,6 +221,14 @@
                     <div class="summary-item" style="display: flex; justify-content: space-between;">
                         <span class="summary-title">Total Profit:</span>
                         <span>RM ${totalProfit}</span>
+                    </div>
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Profit (1-15):</span>
+                        <span>RM ${totalProfitFirstHalf}</span>
+                    </div>
+                    <div class="summary-item" style="display: flex; justify-content: space-between;">
+                        <span class="summary-title">Total Profit (16-${new Date(selectedYear, selectedMonth + 1, 0).getDate()}):</span>
+                        <span>RM ${totalProfitSecondHalf}</span>
                     </div>
                     <div class="summary-item" style="display: flex; justify-content: space-between;">
                         <span class="summary-title">Total Transfer (Paid):</span>
