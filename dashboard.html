@@ -195,7 +195,6 @@
                     return counts;
                 }, {});
 
-                // Remove the half-month calculations from here
                 const statusCountsHtml = `
                     <div class="summary-item"><span class="summary-title">Paid:</span> <span>${statusCounts['Paid'] || 0}</span></div>
                     <div class="summary-item"><span class="summary-title">Pending:</span> <span>${statusCounts['Pending'] || 0}</span></div>
@@ -204,52 +203,6 @@
                 let totalTransaction = (statusCounts['Paid'] || 0) + (statusCounts['Pending'] || 0);
 
                 // Add new calculations for half-month periods
-                const totalProfitFirstHalf = filteredProfits
-                    .filter(profit => new Date(profit.date).getDate() <= 15)
-                    .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
-                    .toFixed(2);
-                
-                const totalProfitSecondHalf = filteredProfits
-                    .filter(profit => new Date(profit.date).getDate() >= 16)
-                    .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
-                    .toFixed(2);
-
-                container.innerHTML = `
-                    <div class="summary-item" style="display: flex; justify-content: space-between;">
-                        <span class="summary-title">Total Transfer:</span>
-                        <span>RM ${totalTransfer}</span>
-                    </div>
-                    <div class="summary-item" style="display: flex; justify-content: space-between;">
-                        <span class="summary-title">Total Profit:</span>
-                        <span>RM ${totalProfit}</span>
-                    </div>
-                    <!-- Removed half-month entries from this template -->
-                    <div class="summary-item" style="display: flex; justify-content: space-between;">
-                        <span class="summary-title">Total Transfer (Paid):</span>
-                        <span>RM ${totalTransferPaid}</span>
-                    </div>
-                    <div class="summary-item" style="display: flex; justify-content: space-between;">
-                        <span class="summary-title">Total Transfer (Pending):</span>
-                        <span>RM ${totalTransferPending}</span>
-                    </div>
-                    <div class="summary-item" style="display: flex; justify-content: space-between;">
-                        <span class="summary-title">Total Profit (Paid):</span>
-                        <span>RM ${totalProfitPaid}</span>
-                    </div>
-                    <div class="summary-item" style="display: flex; justify-content: space-between;">
-                        <span class="summary-title">Total Profit (Pending):</span>
-                        <span>RM ${totalProfitPending}</span>
-                    </div>
-                    ${statusCountsHtml}
-                    <div class="summary-item"><span class="summary-title">Total Transaction:</span> <span>${totalTransaction}</span></div>
-                `;
-            };
-
-            // Add new function for monthly summary
-            const renderMonthlySummary = (container, filteredProfits) => {
-                const totalTransfer = filteredProfits.reduce((sum, profit) => sum + parseFloat(profit.transfer), 0).toFixed(2);
-                const totalProfit = filteredProfits.reduce((sum, profit) => sum + parseFloat(profit.profit), 0).toFixed(2);
-
                 const totalProfitFirstHalf = filteredProfits
                     .filter(profit => new Date(profit.date).getDate() <= 15)
                     .reduce((sum, profit) => sum + parseFloat(profit.profit), 0)
